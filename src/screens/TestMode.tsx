@@ -5,7 +5,7 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react'
 import type { Item, Region } from '../data/types'
 import { RegionMap, type MarkerState } from '../map/RegionMap'
-import { isTypedAnswerCorrect, numberItems, shuffle } from '../lib/quiz'
+import { alphabeticalIds, isTypedAnswerCorrect, numberItems } from '../lib/quiz'
 import { itemKey, loadProgress, recordTest, saveMethod, type Method } from '../lib/progress'
 
 interface TestModeProps {
@@ -98,7 +98,7 @@ export function TestSession({
   resultNote,
 }: TestSessionProps) {
   const [numbers] = useState(() => numberItems(region, items))
-  const [bankOrder] = useState(() => shuffle(items.map((i) => i.id)))
+  const [bankOrder] = useState(() => alphabeticalIds(items)) // word bank, A to Z
   const [placed, setPlaced] = useState<Record<string, string>>({}) // Word Bank: marker id -> chosen name id
   const [typed, setTyped] = useState<Record<string, string>>({}) // Type It: item id -> typed text
   const [pickedName, setPickedName] = useState<string | null>(null)

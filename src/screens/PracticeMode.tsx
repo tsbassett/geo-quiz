@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Item, Region } from '../data/types'
 import { RegionMap, type MarkerState } from '../map/RegionMap'
-import { numberItems, shuffle } from '../lib/quiz'
+import { alphabeticalIds, numberItems } from '../lib/quiz'
 
 interface PracticeProps {
   region: Region
@@ -25,8 +25,8 @@ type Feedback = { tone: 'good' | 'bad' | 'info'; text: string }
 
 function PracticeSession({ region, items, onPracticeAll, onRestart }: PracticeProps & { onRestart: () => void }) {
   const [numbers] = useState(() => numberItems(region, items))
-  // Names still waiting to be matched, in word-bank order.
-  const [bank, setBank] = useState(() => shuffle(items.map((i) => i.id)))
+  // Names still waiting to be matched, in word-bank order (A to Z).
+  const [bank, setBank] = useState(() => alphabeticalIds(items))
   const [correct, setCorrect] = useState<Set<string>>(() => new Set())
   const [pickedName, setPickedName] = useState<string | null>(null)
   const [pickedMarker, setPickedMarker] = useState<string | null>(null)
@@ -54,8 +54,7 @@ function PracticeSession({ region, items, onPracticeAll, onRestart }: PracticePr
     } else {
       setMistakes((m) => m + 1)
       setWrongFlash({ id: markerId })
-      // The name goes back to the end of the word bank to try again.
-      setBank((old) => [...old.filter((id) => id !== nameId), nameId])
+      // The name stays in the word bank (in its A-to-Z place) to try again.
       setFeedback({ tone: 'bad', text: `Not quite. ${numbers[markerId]} is not ${label(nameId)}. Try again!` })
     }
   }

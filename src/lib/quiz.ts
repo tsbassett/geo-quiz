@@ -3,14 +3,11 @@
 import type { Item, Region } from '../data/types'
 import { makeProjection, markerAnchor, regionAspect } from '../map/geometry'
 
-/** Returns a copy of the list in random order. */
-export function shuffle<T>(list: T[]): T[] {
-  const copy = [...list]
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[copy[i], copy[j]] = [copy[j], copy[i]]
-  }
-  return copy
+/** The items' ids, sorted A to Z by name (ignoring capital letters and accents), for the word bank. */
+export function alphabeticalIds(items: Item[]): string[] {
+  return [...items]
+    .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }))
+    .map((item) => item.id)
 }
 
 /**
@@ -48,7 +45,7 @@ export function numberItems(region: Region, items: Item[]): Record<string, strin
   const rowShift = Math.random() * rowHeight
 
   const placed = items.map((item) => {
-    const [x, y] = markerAnchor(item, projection) ?? [0, 0]
+    const [x, y] = markerAnchor(item, projection, region.bbox) ?? [0, 0]
     return { id: item.id, row: Math.floor((y + rowShift) / rowHeight), x }
   })
   placed.sort((a, b) => a.row - b.row || a.x - b.x)

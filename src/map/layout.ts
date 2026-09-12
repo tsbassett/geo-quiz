@@ -15,11 +15,13 @@ export interface MarkerBox {
   round: boolean
 }
 
-/** Something markers should not cover, like a city dot. */
+/** Something markers should not cover: a city dot (round) or a small feature (a box). */
 export interface Obstacle {
   x: number
   y: number
-  r: number
+  halfW: number
+  halfH: number
+  round: boolean
 }
 
 const GAP = 4 // pixels of space kept between markers
@@ -80,10 +82,9 @@ export function spreadMarkers(
         pos[i].x += (box.x - pos[i].x) * 0.03
         pos[i].y += (box.y - pos[i].y) * 0.03
       }
-      // Keep off city dots (the dot never moves, so the marker takes the whole push).
+      // Keep off city dots and small features (they never move, so the marker takes the whole push).
       for (const o of obstacles) {
-        const dot = { x: o.x, y: o.y }
-        separate(dot, { halfW: o.r, halfH: o.r, round: box.round }, pos[i], box, 0, i)
+        separate({ x: o.x, y: o.y }, o, pos[i], box, 0, i)
       }
     })
     for (let i = 0; i < boxes.length; i++) {
